@@ -4,15 +4,7 @@ import random
 from docarray import BaseDoc, DocList
 from docarray.documents import ImageDoc, TextDoc
 
-
-class Book(BaseDoc):
-    title: str
-    author: str
-    price: float
-    rating: float
-    desc: TextDoc
-    image: ImageDoc
-
+from helper import Book, clip_encode_desc
 
 book1 = Book(
     title="Hitchhiker's Guide to the Galaxy",
@@ -42,11 +34,14 @@ with open('data/books.csv', newline='') as csvfile:
             title=row['title'],
             author=row['author'],
             price=price,
-            rating=rating,
+            rating=row['rating'],
             desc=TextDoc(text=row['desc']),
             image=ImageDoc(url=row['image']),
         )
 
         books.append(doc=book)
 
-books.push('file://books.docarray')
+books.save_binary('books.bin')
+
+index = clip_encode_desc(books[0:1])
+print(index[0])
