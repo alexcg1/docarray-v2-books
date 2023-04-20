@@ -15,11 +15,16 @@ if db.num_docs() == 0:
     print(f'Index is empty. Will build index from {MAX_DOCS} records')
 
     docs = load_csv(CSV_FILE, MAX_DOCS, 'product_description')
+
     print('Encoding records')
     encoded_docs = DocList[TextDoc](
         list(map_docs(docs, clip_encode_desc, show_progress=True))
     )
 
+    for doc in encoded_docs:
+        assert hasattr(doc, 'embedding')
+
+    # this doesn't seem to store vectors. only sqlite stuff in work_dir
     print('Storing records in Document Index')
     db.index(encoded_docs)
 
@@ -29,11 +34,11 @@ query = TextDoc(
 
 print('Encoding query')
 encoded_query = clip_encode_desc(query)
+assert hasattr(encoded_query, 'embedding')
 
+# this breaks bc it can't find vectors
 print('Matching query with records in index')
-matches, scores = db.find(
-    encoded_query, search_field='embedding', limit=5
-)   # this breaks
+matches, scores = db.find(encoded_query, search_field='embedding', limit=5)
 
 for match in matches:
     print(match.desc, '\n---\n')
