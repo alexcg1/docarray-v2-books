@@ -1,0 +1,4 @@
+docarray==0.30.0
+protobuf==4.22.3
+requests==2.28.2
+python-dotenv==1.0.0
